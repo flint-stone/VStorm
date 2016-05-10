@@ -33,7 +33,7 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 
-public class ClientStatRenderSpout extends BaseRichSpout {
+public class ClientInfoRenderSpout extends BaseRichSpout {
   SpoutOutputCollector _collector;
   Random _rand;
 
@@ -50,31 +50,22 @@ public class ClientStatRenderSpout extends BaseRichSpout {
     //String[] sentences = new String[]{ "the cow jumped over the moon", "an apple a day keeps the doctor away",
      //   "four score and seven years ago", "snow white and the seven dwarfs", "i am at two with nature" };
     //String sentence = sentences[_rand.nextInt(sentences.length)];
-    File file = new File("resource/c_stat");
-    //VClientInfo info = null;
-    Long time =0L;
+    File file = new File("client_list");
+    //VServerInfo info = null;
     String id = "";
 	String ip = "";
-	String port = "";
-	int bandwidth = 0;
-	int buffer_size = 0;
-	int framerate = 0;
-	
-
+	//String port = "";
+	Long time = 0L;
     try (BufferedReader br = new BufferedReader(new FileReader(file))) {
         String line;
-        
 		while ((line = br.readLine()) != null) {
 			   // process the line.
 				String[] parts = line.split(":");
 				id = parts[0];
 				ip = parts[1];
-				//String port = parts[2];
-				buffer_size = Integer.valueOf(parts[2]);
-				bandwidth = Integer.valueOf(parts[3]);
-				framerate = Integer.valueOf(parts[4]);
+				//port = parts[2];
 				time = System.currentTimeMillis();
-				//info = new VClientInfo(id, ip, buffer_size, bandwidth, framerate);
+				//info = new VServerInfo(id, ip, port);
 		}
     } catch (FileNotFoundException e1) {
 		// TODO Auto-generated catch block
@@ -85,8 +76,7 @@ public class ClientStatRenderSpout extends BaseRichSpout {
 	}
 
     
-    //_collector.emit(new Values(time, info));
-    _collector.emit(new Values(time, id, ip, port, bandwidth, buffer_size, framerate));
+    _collector.emit(new Values(time, id, ip));
   }
 
   @Override
@@ -99,7 +89,7 @@ public class ClientStatRenderSpout extends BaseRichSpout {
 
   @Override
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields("time", "id", "clientstat"));
+    declarer.declare(new Fields("time","id", "ip", "port"));
   }
 
 }

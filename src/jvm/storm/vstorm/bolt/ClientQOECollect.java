@@ -51,18 +51,22 @@ public class ClientQOECollect extends BaseRichBolt {
     	//int id = Integer.valueOf(info.getId());
     	//File file = new File("");
     	Long time = tuple.getLongByField("time");
-    	VClientInfo info = (VClientInfo) tuple.getValueByField("clientstat");
-    	int bandwidth = Integer.valueOf(info.getBandwidth());
-    	int buffer_size = Integer.valueOf(info.getBuffer_size());
-    	int framerate = Integer.valueOf(info.getFramerate());
+    	//VClientInfo info = (VClientInfo) tuple.getValueByField("clientstat");
+    	//declarer.declare(new Fields("time", "id", "ip", "port", "bw", "bs", "fr"));
+    	String id = tuple.getStringByField("id");
+    	String ip = tuple.getStringByField("ip");
+    	//String port = tuple.getStringByField("port");
+    	int bandwidth = Integer.valueOf(tuple.getStringByField("bw"));
+    	int buffer_size = Integer.valueOf(tuple.getStringByField("bs"));
+    	int framerate = Integer.valueOf(tuple.getStringByField("fr"));
     	Double qoe = (double)bandwidth/5000.0+(double)buffer_size/5000.0+(double)framerate/30.0;
     	if(qoe>3){
     		//qoe satisfied, do nothing
-    		_collector.emit(new Values(time, info.getId(), info.getIp(), bandwidth, buffer_size, framerate, qoe, "good"));
+    		_collector.emit(new Values(time, id, ip, bandwidth, buffer_size, framerate, qoe, "good"));
     	}
     	else{
     		//qoe not satisfied, try a different bit rate
-    		_collector.emit(new Values(time, info.getId(), info.getIp(), bandwidth, buffer_size, framerate, qoe, "bad"));
+    		_collector.emit(new Values(time, id, ip, bandwidth, buffer_size, framerate, qoe, "bad"));
     	}
     	
     	

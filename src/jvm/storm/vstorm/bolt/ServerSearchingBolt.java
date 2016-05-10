@@ -38,6 +38,7 @@ public class ServerSearchingBolt extends BaseRichBolt {
 	/**
 	 * 
 	 */
+	String path_root="/home/lexu/Desktop/storm-starter/resource/";
 	private static final long serialVersionUID = 1L;
 	OutputCollector _collector;
 	
@@ -61,7 +62,7 @@ public class ServerSearchingBolt extends BaseRichBolt {
     	if(result.equals("bad")){
     		//server
        	 File file = new File("server_list");
-       	 File currentServerFile = new File(id+"_c_servertaget");
+       	 File currentServerFile = new File(path_root+id+"_c_servertaget");
        	    try (BufferedReader br3 = new BufferedReader(new FileReader(currentServerFile))) {
        	        String cur_server_line = br3.readLine();
        	        String[] parts2 = cur_server_line.split(":");
@@ -78,7 +79,7 @@ public class ServerSearchingBolt extends BaseRichBolt {
        					String sport = parts[2];
        					//read server resource
        					if(!sid.equals(c_sid)){
-       						String resource_filename = sid+"_s_resource.txt";
+       						String resource_filename = path_root+ sid+"_s_resource";
            					File fr = new File(resource_filename);
            					BufferedReader br2 = new BufferedReader(new FileReader(fr));
            					String line2 = br2.readLine();

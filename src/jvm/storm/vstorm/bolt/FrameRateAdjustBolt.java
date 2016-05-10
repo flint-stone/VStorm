@@ -53,6 +53,7 @@ public class FrameRateAdjustBolt extends BaseRichBolt {
     	Long time =tuple.getLongByField("time");
     	String id = tuple.getStringByField("id");
     	String ip = tuple.getStringByField("ip");
+    	String port = tuple.getStringByField("port");
     	int bandwidth = tuple.getIntegerByField("bw");
     	int buffer_size = tuple.getIntegerByField("bs");
     	int framerate = tuple.getIntegerByField("fr");

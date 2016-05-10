@@ -19,9 +19,14 @@ package storm.vstorm;
 
 import backtype.storm.Config;
 import backtype.storm.StormSubmitter;
+import backtype.storm.topology.BoltDeclarer;
 import backtype.storm.topology.TopologyBuilder;
-import storm.vstorm.bolt.IMGBolt;
-import storm.vstorm.spout.IMGSpout;
+import storm.vstorm.bolt.ClientQOECollect;
+import storm.vstorm.bolt.FinalCollectSink;
+import storm.vstorm.bolt.FrameRateAdjustBolt;
+import storm.vstorm.bolt.ServerChangeSink;
+import storm.vstorm.bolt.ServerSearchingBolt;
+import storm.vstorm.spout.ClientStatRenderSpout;
 
 
 
@@ -32,16 +37,26 @@ public class ClientSideAdaptionTopology {
 
 
 	public static void main(String[] args) throws Exception {
+		int paralellism = 2;
+
 		TopologyBuilder builder = new TopologyBuilder();
 
-		builder.setSpout("image-spout", new IMGSpout(), 1);
-		builder.setBolt("image-bolt", new IMGBolt(), 1).shuffleGrouping("image-spout");
+		builder.setSpout("ClientStatRender_spout", new ClientStatRenderSpout(), paralellism);
 
+		builder.setBolt("ClientQOECalculation_bolt", new ClientQOECollect(), paralellism).shuffleGrouping("ClientStatRender_spout");
+		builder.setBolt("FrameRateAdjust_bolt", new FrameRateAdjustBolt(), paralellism).shuffleGrouping("ClientQOECalculation_bolt");
+		BoltDeclarer output1 = builder.setBolt("FinalCollect_sink", new FinalCollectSink(), paralellism);
+		output1.shuffleGrouping("ClientQOECalculation_bolt");
+		output1.shuffleGrouping("FrameRateAdjust_bolt");
+		builder.setBolt("ServerSearching_bolt", new ServerSearchingBolt(), paralellism).shuffleGrouping("FrameRateAdjust_bolt");
+		builder.setBolt("ServerChange_sink", new ServerChangeSink(), paralellism).shuffleGrouping("ServerSearching_bolt");
+		
 		Config conf = new Config();
 		conf.setDebug(true);
 
-		conf.setNumWorkers(2);
 		conf.setNumAckers(0);
+
+		conf.setNumWorkers(4);
 
 		StormSubmitter.submitTopologyWithProgressBar(args[0], conf, builder.createTopology());
 

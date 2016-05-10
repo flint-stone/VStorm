@@ -38,7 +38,7 @@ public class ServerChangeSink extends BaseRichBolt {
 	 */
 	private static final long serialVersionUID = 1L;
 	OutputCollector _collector;
-	
+	String path_root="/home/lexu/Desktop/storm-starter/resource/";
 
     @Override
     public void prepare(Map conf, TopologyContext context, OutputCollector collector) {
@@ -61,7 +61,7 @@ public class ServerChangeSink extends BaseRichBolt {
     		Long current = System.currentTimeMillis();
     		Long latency = current-time;
     		//write latency
-    		File latencylog = new File(id+"LatencyLog");
+    		File latencylog = new File("LatencyLog");
             FileWriter llWriter;
             try {
                 llWriter = new FileWriter(latencylog, true); // false to overwrite.
@@ -72,7 +72,7 @@ public class ServerChangeSink extends BaseRichBolt {
                 e.printStackTrace();
             } // true to append   
     		//write server and new framerate if changed                      
-            File myFoo = new File(id+"_c_FRRequest");
+            File myFoo = new File(path_root+id+"_c_FRRequest");
             FileWriter fooWriter;
             try {
                 fooWriter = new FileWriter(myFoo, false); // false to overwrite.
@@ -83,7 +83,7 @@ public class ServerChangeSink extends BaseRichBolt {
                 e.printStackTrace();
             } // true to append    
             
-            File currentServerFile = new File(id+"_c_servertaget");
+            File currentServerFile = new File(path_root+id+"_c_servertaget");
             FileWriter barWriter;
             try {
                 barWriter = new FileWriter(currentServerFile, false); // false to overwrite.

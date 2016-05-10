@@ -18,8 +18,10 @@
 package storm.vstorm.bolt;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 
@@ -39,7 +41,7 @@ public class FinalCollectSink extends BaseRichBolt {
 	 */
 	private static final long serialVersionUID = 1L;
 	OutputCollector _collector;
-	
+	String path_root = "/home/lexu/Desktop/storm-starter/resource/";
 
     @Override
     public void prepare(Map conf, TopologyContext context, OutputCollector collector) {
@@ -48,7 +50,7 @@ public class FinalCollectSink extends BaseRichBolt {
     @Override
     public void execute(Tuple tuple) {
     	//VServerInfo info = (VServerInfo) tuple.getValueByField("info");
-    	//int id = Integer.valueOf(info.getId());
+    	String id = tuple.getStringByField("id");
     	//File file = new File("");
     	Long time = tuple.getLongByField("time");
     	int framerate =tuple.getIntegerByField("fr");
@@ -59,7 +61,27 @@ public class FinalCollectSink extends BaseRichBolt {
     		Long current = System.currentTimeMillis();
     		Long latency = current-time;
     		//write latency
+    		File latencylog = new File("LatencyLog");
+            FileWriter llWriter;
+            try {
+                llWriter = new FileWriter(latencylog, true); // false to overwrite.
+                llWriter.write(String.valueOf(latency));
+                llWriter.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } // true to append   
     		//write framerate if changed
+            File myFoo = new File(path_root+id+"_c_FRRequest");
+            FileWriter fooWriter;
+            try {
+                fooWriter = new FileWriter(myFoo, false); // false to overwrite.
+                fooWriter.write(String.valueOf(framerate));
+                fooWriter.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } // true to append  
     		_collector.emit(new Values(time));
     	}  	
     	//collector.emit(new Values(obj, count, actualWindowLengthInSeconds));
